@@ -1,0 +1,67 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Chat IBM Cloud Function",
+    "description": "IBM Cloud function to call ChatGPT and receive a response with two string parameters and a JSON object response with Bearer security.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://us-south.functions.appdomain.cloud/api/v1/web/0677df3f-3fca-428b-b0fc-46dbc2fd95d5/default/GPT2",
+      "description": "Production server"
+    }
+  ],
+  "paths": {
+    "/my-function": {
+      "post": {
+        "summary": "My IBM Cloud Function",
+        "description": "Invoke my IBM Cloud Function with two string parameters and a JSON object response",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "question": {
+                    "type": "string"
+                  },
+                  "qualifier": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "question",
+                  "qualifier"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "MyResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

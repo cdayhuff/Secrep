@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>IBM Cloud Function Demo</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      margin: 20px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    .form-container {
+      display: flex;
+      /* align-items: center; */
+      flex-direction: column;
+    }
+
+    label {
+      /* font-weight: bold; */
+      display: inline-block;
+      margin-bottom: 0.5rem;
+      margin-top: 20px;
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    .form-container textarea {
+      flex-grow: 1;
+      height: 200px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 40px;
+      resize: vertical;
+      padding: 22px;
+    }
+
+    .submit-button {
+      margin-left: 32px;
+      display: flex;
+      align-items: center;
+    }
+
+    #result {
+      width: 91%;
+      height: 200px;
+      margin-top: 20px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 40px;
+      resize: vertical;
+      padding: 22px;
+    }
+
+    #copyButton {
+      margin: 21px;
+      border-radius: 12px;
+    }
+
+    .container_text_button {
+      display: flex;
+      flex-direction: row;
+    }
+
+    .second_container {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .body_container {
+      margin: 21px;
+      padding: 16px;
+    }
+
+    .btn-primary {
+      color: #fff;
+      background-color: #007bff;
+      border-color: #007bff;
+      border-radius: 10px;
+      margin-top: 81px;
+    }
+  </style>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+<body>
+  <h1>IBM Cloud Function Demo</h1>
+  <div class="body_container">
+    <form id="myForm">
+      <div class="form-container">
+        <label for="question">Insert your question or text to process and select enter</label>
+        <div class="container_text_button">
+          <textarea id="question" name="question" required></textarea>
+          <div class="submit-button">
+            <input type="submit" value="ENTER" class="btn btn-primary">
+          </div>
+        </div>
+      </div>
+    </form>
+    <div class="second_container">
+      <label for="result">Result:</label>
+      <textarea id="result" readonly placeholder="Press Enter to get the result"></textarea>
+    </div>
+    <button id="copyButton" class="btn btn-secondary">Copy Result</button>
+  </div>
+
+  <script>
+    $(document).ready(function() {
+  // Handle form submission
+  $('#myForm').submit(function(event) {
+    event.preventDefault(); // Prevent form submission
+
+    // Get the value from the input field
+    var question = $('#question').val();
+    var qualifier = 'ibonoly';
+
+    // Display the "Fetching result..." placeholder
+    $('#result').attr('placeholder', 'Fetching result...');
+
+    // Make the AJAX request to the IBM Cloud Function
+    $.ajax({
+      url: 'https://us-south.functions.appdomain.cloud/api/v1/web/0677df3f-3fca-428b-b0fc-46dbc2fd95d5/default/GPT2/my-function',
+      type: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify({ question: question, qualifier: qualifier }),
+      success: function(response) {
+        // Log the complete JSON response in the console
+        console.log(response);
+
+        // Extract the exact answer from the JSON response
+        var answer = response.message.replace(/.*\n\n/, '');
+
+        // Display the answer in the text area
+        $('#result').val(answer);
+      },
+      error: function(xhr, textStatus, errorThrown) {
+        console.error('Error:', errorThrown);
+      }
+    });
+  });
+
+  // Handle copy button click
+  $('#copyButton').click(function() {
+    var result = $('#result').get(0);
+    result.select();
+    document.execCommand("copy");
+
+    // Show Bootstrap modal with copy message
+    $('<div class="modal" tabindex="-1" role="dialog">' +
+      '<div class="modal-dialog" role="document">' +
+      '<div class="modal-content">' +
+      '<div class="modal-body">' +
+      'Result copied to clipboard!' +
+      '</div>' +
+      '</div>' +
+      '</div>' +
+      '</div>').modal('show');
+  });
+
+  // Handle Enter key press
+  $('#question').keypress(function(e) {
+    if (e.which === 13) {
+      e.preventDefault();
+      $('#result').attr('placeholder', 'Fetching result...');
+      $('#myForm').submit();
+    }
+  });
+});
+
+  </script>
+</body>
+</html>
